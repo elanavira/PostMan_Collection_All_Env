@@ -1,0 +1,780 @@
+{
+	"info": {
+		"_postman_id": "4d0207cb-820a-42d2-82a4-6d3e32e7532a",
+		"name": "Switch_API_Transactions_Refunds_All_Env",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33665851"
+	},
+	"item": [
+		{
+			"name": "BearerToken_Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var access_token = res_body.responseObject.access_token\r",
+							"\r",
+							"console.log(access_token)\r",
+							"\r",
+							"pm.environment.set('access_token', access_token)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set('Testing_Env', pm.iterationData.get(\"Testing_Env\"))\r",
+							"\r",
+							"var test_env = pm.environment.get('Testing_Env')\r",
+							"\r",
+							"if (test_env == 'Stage')\r",
+							"{\r",
+							"   pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.stage-orlando.payresults.ai\")\r",
+							"   pm.environment.set (\"issuer_api_url\",\"https://issuer-api.stage-orlando.payresults.ai\")\r",
+							"   pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.stage-orlando.payresults.ai\")  \r",
+							"   pm.environment.set(\"db\", \"https://ops-dashboard.stage-orlando.payresults.ai\")\r",
+							"}\r",
+							"else if (test_env == 'UAT')\r",
+							"{\r",
+							"    pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.uat-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"issuer_api_url\",\"https://issuer-api.uat-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.uat-orlando.payresults.ai\")  \r",
+							"    pm.environment.set(\"db\", \"https://ops-dashboard.uat-orlando.payresults.ai\")\r",
+							"}\r",
+							"else\r",
+							"{\r",
+							"    pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.vapt-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"issuer_api_url\",\"https://issuer-api.vapt-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.vapt-orlando.payresults.ai\")    \r",
+							"    pm.environment.set(\"db\", \"https://ops-dashboard.vapt-orlando.payresults.ai\")\r",
+							"}\r",
+							"\r",
+							"pm.environment.set('consumer_card_number', pm.iterationData.get(\"consumer_card_number\"))\r",
+							"pm.environment.set('amount', pm.iterationData.get(\"amount\"))\r",
+							"pm.environment.set('transaction_type', pm.iterationData.get(\"transaction_type\"))\r",
+							"pm.environment.set('currency', pm.iterationData.get(\"currency\"))\r",
+							"pm.environment.set('tid', pm.iterationData.get(\"tid\"))\r",
+							"pm.environment.set('merchant_name', pm.iterationData.get(\"merchant_name\"))\r",
+							"pm.environment.set('merchant_id', pm.iterationData.get(\"merchant_id\"))\r",
+							"pm.environment.set('merchant_email', pm.iterationData.get(\"merchant_email\"))\r",
+							"pm.environment.set('merchant_pwd', pm.iterationData.get(\"merchant_pwd\"))\r",
+							"pm.environment.set('totp_secret', pm.iterationData.get(\"totp_secret\"))\r",
+							"pm.environment.set('first_name', pm.iterationData.get(\"first_name\"))\r",
+							"pm.environment.set('last_name', pm.iterationData.get(\"last_name\"))\r",
+							"pm.environment.set('phone', pm.iterationData.get(\"phone\"))"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{merchant_pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{merchant_email}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment_switch_api_url}}/login",
+					"host": [
+						"{{payment_switch_api_url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "totp_creation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let totp_secret = pm.environment.get('totp_secret')"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var totp_created = res_body\r",
+							"\r",
+							"console.log(totp_created)\r",
+							"\r",
+							"pm.environment.set('otp', totp_created)\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuer_api_url}}/issuer/totp?key={{totp_secret}}&seconds=60",
+					"host": [
+						"{{issuer_api_url}}"
+					],
+					"path": [
+						"issuer",
+						"totp"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "{{totp_secret}}"
+						},
+						{
+							"key": "seconds",
+							"value": "60"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switch_Transactions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"var req_data = JSON.stringify(JSON.parse(pm.request.body.raw)); \r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var res = data.responsetext\r",
+							"console.log(res)\r",
+							"\r",
+							"pm.test('Request Data => ' + req_data)\r",
+							"console.log(req_data)\r",
+							"\r",
+							"\r",
+							"    pm.test(`switch_response => ${data.response}`, () => {\r",
+							"        pm.expect(data.response).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`switch_responsetext => ${data.responsetext}`, () => {\r",
+							"        pm.expect(data.responsetext).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`switch_authcode => ${data.authcode}`, () => {\r",
+							"        pm.expect(data.authcode).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`switch_transaction(ref)_id => ${data.transaction_id}`, () => {\r",
+							"        pm.expect(data.transaction_id).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`switch_response_code => ${data.response_code}`, () => {\r",
+							"        pm.expect(data.response_code).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`switch_transaction_date => ${data.transaction_date}`, () => {\r",
+							"        pm.expect(data.transaction_date).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`switch_consumer_name => ${data.consumer_name}`, () => {\r",
+							"        pm.expect(data.consumer_name).to.be.not.null;\r",
+							"    });\r",
+							"\r",
+							"function delay(ms) {\r",
+							"  var start = Date.now();\r",
+							"  var end = start;\r",
+							"  while (end < start + ms) {\r",
+							"    end = Date.now();\r",
+							"  }\r",
+							"} \r",
+							"\r",
+							"// Delay for 5000 milliseconds (5 seconds)\r",
+							"delay(10000);\r",
+							"\r",
+							"console.log('Delay for 10 Secs')"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var uuid=require('uuid')\r",
+							"var trans_uuid=uuid.v4();\r",
+							"pm.environment.set('trans_uuid', trans_uuid)\r",
+							"\r",
+							"//var otp = pm.collectionVariables.get('otp').toString()\r",
+							"\r",
+							"var otp = pm.environment.get('otp')\r",
+							"\r",
+							"const btoa = require(\"btoa\");\r",
+							"let cardNumber = pm.environment.get('consumer_card_number')\r",
+							"let firstName = pm.environment.get('first_name')\r",
+							"let lastName = pm.environment.get('last_name')\r",
+							"let PhoneNumber = pm.environment.get('phone')\r",
+							"let consolidated = `(${firstName}, ${lastName}, ${PhoneNumber}):(${cardNumber},${otp}):37.4219983:-122.084:LütConsumer`\r",
+							"console.log(consolidated)\r",
+							"\r",
+							"var Btoa_encodedData = btoa(consolidated);\r",
+							"\r",
+							"console.log(Btoa_encodedData)\r",
+							"\r",
+							"pm.environment.set('payment_token', Btoa_encodedData)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"{{transaction_type}}\",\r\n    \"payment_token\":\"{{payment_token}}\",\r\n    \"transaction_id\": \"{{trans_uuid}}\",\r\n    \"tid\": \"{{tid}}\",\r\n    \"amount\": {{amount}},\r\n    \"currency\": \"{{currency}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment_switch_api_url}}/transactions",
+					"host": [
+						"{{payment_switch_api_url}}"
+					],
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API_Trigger_PrepareClearanceFile",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{clearingFile_api_url}}/prepareClearanceFile",
+					"host": [
+						"{{clearingFile_api_url}}"
+					],
+					"path": [
+						"prepareClearanceFile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API_Trigger_PaymentClearing",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{issuer_api_url}}/issuer/paymentClearing",
+					"host": [
+						"{{issuer_api_url}}"
+					],
+					"path": [
+						"issuer",
+						"paymentClearing"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DB_Switch_Capture_Transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"var ref_id = pm.environment.get('trans_uuid')\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Transaction Id => \" + res_body[0].transaction_id + \" Transaction Status => \" + res_body[0].status, function()\r",
+							"    {  \r",
+							"  pm.expect(res_body[0].reference_id).to.equal(ref_id);\r",
+							"})\r",
+							"\r",
+							"let trans_id = res_body[0].transaction_id\r",
+							"let capture_id = res_body[0].id\r",
+							"\r",
+							"pm.environment.set('trans_id', trans_id)\r",
+							"\r",
+							"pm.environment.set('capture_id', capture_id)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from payment.capture where reference_id IN ('{{trans_uuid}}')\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/switch",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"switch"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API_Switch_Transactions_Refunds",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var uuid=require('uuid')\r",
+							"var refund_trans_uuid=uuid.v4();\r",
+							"pm.environment.set('refund_trans_uuid', refund_trans_uuid)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"refund\",\r\n    \"transaction_id\": \"{{refund_trans_uuid}}\",\r\n    \"reference_transaction_id\": \"{{trans_id}}\",    \r\n    \"payment\": \"creditcard\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment_switch_api_url}}/refunds",
+					"host": [
+						"{{payment_switch_api_url}}"
+					],
+					"path": [
+						"refunds"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DB_Switch_Capture_Transaction_After_Refund",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"var ref_id = pm.environment.get('trans_uuid')\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Transaction Id => \" + res_body[0].transaction_id + \" Transaction Status => \" + res_body[0].status, function()\r",
+							"    {  \r",
+							"  pm.expect(res_body[0].reference_id).to.equal(ref_id);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from payment.capture where reference_id IN ('{{trans_uuid}}')\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/switch",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"switch"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BearerToken_Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var res_code = res_body.responseCode\r",
+							"\r",
+							"console.log(res_code)\r",
+							"\r",
+							"//pm.collectionVariables.set('access_token', access_token)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment_switch_api_url}}/logout",
+					"host": [
+						"{{payment_switch_api_url}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "trans_uuid",
+			"value": ""
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "totp_secret",
+			"value": ""
+		},
+		{
+			"key": "otp",
+			"value": ""
+		},
+		{
+			"key": "payment_token",
+			"value": ""
+		},
+		{
+			"key": "consumer_card_number",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "amount",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "transaction_type",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "currency",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "tid",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "merchant_id",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "merchant_email",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "merchant_pwd",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "first_name",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "last_name",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "phone",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "merchant_name",
+			"value": ""
+		},
+		{
+			"key": "Testing_Env",
+			"value": ""
+		}
+	]
+}

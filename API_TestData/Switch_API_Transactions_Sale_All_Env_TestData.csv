@@ -1,0 +1,6 @@
+Testing_Env,consumer_card_number,amount,transaction_type,currency,tid,merchant_name,merchant_id,merchant_email,merchant_pwd,totp_secret,first_name,last_name,phone
+UAT,9000012289281293,2,sale,USD,LUT,StandardPass,2a264212-2587-4ba7-94bf-276fc33d26c7,standardpass@gmail.com,Admin@123,GI2TMOJZGY======,Kay,Sieben,803-442-8049
+UAT,9000015971957658,3,sale,USD,LUT,WaterfallPass,6ba864e1-c5e8-4796-9893-84df4044a3e6,waterfallpass@gmail.com,Admin@123,GI2TMOJZGM======,Concha,Endicott,702-977-8436
+UAT,9000013008182937,4,sale,USD,LUT,WaterfallFlat,6f5e00a3-0104-4900-b045-7325005a4761,waterfallflat@gmail.com,Admin@123,GI2TMOJZGU======,Victor,Oliver,914-749-9820
+UAT,9000019725188560,5,sale,USD,LUT,NoTierPass,2c8ce4d6-17af-4841-8543-0f12e400706b,notierpass@gmail.com,Admin@123,GI2TMOJZGI======,Alexander,Kelly,908-650-2993
+UAT,9000019725188560,5,sale,USD,LUT,Waterfall,6f5e00a3-0104-4900-b045-7325005a4761,waterfallflat@gmail.com,Admin@123,GI2TMOJZGI======,Alexander,Kelly,908-650-2993

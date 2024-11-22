@@ -1,0 +1,688 @@
+{
+	"info": {
+		"_postman_id": "212166c6-ae5c-4501-a1d8-5ab2618c6bbd",
+		"name": "Switch_API_Transactions_Recharge_Redemption_All_Env",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33665851"
+	},
+	"item": [
+		{
+			"name": "Lut_Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"if(res_body.response != 2){\r",
+							"   pm.test(\"JSON Array is not empty\")\r",
+							"    var access_token = res_body.responseObject.access_token\r",
+							"\r",
+							"    console.log(access_token)\r",
+							"\r",
+							"    pm.environment.set('access_token', access_token)\r",
+							"\r",
+							"}\r",
+							"else{\r",
+							"    pm.test(\"JSON Array is empty\")\r",
+							"    pm.execution.setNextRequest(null)\r",
+							"}\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set('Testing_Env', pm.iterationData.get(\"Testing_Env\"))\r",
+							"\r",
+							"var test_env = pm.environment.get('Testing_Env')\r",
+							"\r",
+							"if (test_env == 'Stage')\r",
+							"{\r",
+							"   pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.stage-orlando.payresults.ai\")\r",
+							"   pm.environment.set (\"issuer_api_url\",\"https://issuer-api.stage-orlando.payresults.ai\")\r",
+							"   pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.stage-orlando.payresults.ai\")\r",
+							"   pm.environment.set (\"Lut_api_url\",\"https://lut-api.stage-orlando.payresults.ai\")  \r",
+							"   pm.environment.set(\"db\", \"https://ops-dashboard.stage-orlando.payresults.ai\")\r",
+							"}\r",
+							"else if (test_env == 'UAT')\r",
+							"{\r",
+							"    pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.uat-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"issuer_api_url\",\"https://issuer-api.uat-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.uat-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"Lut_api_url\",\"https://lut-api.uat-orlando.payresults.ai\")   \r",
+							"    pm.environment.set(\"db\", \"https://ops-dashboard.uat-orlando.payresults.ai\")\r",
+							"}\r",
+							"else\r",
+							"{\r",
+							"    pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.vapt-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"issuer_api_url\",\"https://issuer-api.vapt-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.vapt-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"Lut_api_url\",\"https://lut-api.vapt-orlando.payresults.ai\")        \r",
+							"    pm.environment.set(\"db\", \"https://ops-dashboard.vapt-orlando.payresults.ai\")\r",
+							"}\r",
+							"\r",
+							"pm.environment.set(\"consumer_card_number\",pm.iterationData.get(\"consumer_card_number\")) \r",
+							"pm.environment.set(\"emailvalue\",pm.iterationData.get(\"consumer_email\")) \r",
+							"pm.environment.set(\"pwd_value\",pm.iterationData.get(\"consumer_pwd\"))\r",
+							"pm.environment.set(\"recharge_amount\",pm.iterationData.get(\"recharge_amount\"))\r",
+							"pm.environment.set(\"redemption_amount\",pm.iterationData.get(\"redemption_amount\"))\r",
+							"\r",
+							"let pwdvalue = pm.environment.get('pwd_value')\r",
+							"console.log(pwdvalue)\r",
+							"// var atob_decodedData = atob(pwdvalue);\r",
+							"// pm.collectionVariables.set(\"pwd_decoded_value\",atob_decodedData)\r",
+							"// console.log(atob_decodedData)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{pwd_value}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{emailvalue}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "deviceId",
+						"value": "0310202400002",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{Lut_api_url}}/lut/login",
+					"host": [
+						"{{Lut_api_url}}"
+					],
+					"path": [
+						"lut",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DB_Issuer_Account_Activity_BeforeRecharge",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"data.forEach(object => {\r",
+							"    pm.test(`card_number => ${object.card_number}`, () => {\r",
+							"        pm.expect(object.card_number).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`transaction_id => ${object.transaction_id}`, () => {\r",
+							"        pm.expect(object.transaction_id).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`amount_activity_date => ${object.amount_activity_date}`, () => {\r",
+							"        pm.expect(object.amount_activity_date).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`created_date => ${object.created_date}`, () => {\r",
+							"        pm.expect(object.created_date).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`trigger_activity => ${object.trigger_activity}`, () => {\r",
+							"        pm.expect(object.trigger_activity).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`amount => ${object.amount}`, () => {\r",
+							"        pm.expect(object.amount).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`available_balance => ${object.available_balance}`, () => {\r",
+							"        pm.expect(object.available_balance).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`pending_balance => ${object.pending_balance}`, () => {\r",
+							"        pm.expect(object.pending_balance).to.be.not.null;\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from customer.account_activity aa where card_number in ('{{consumer_card_number}}') order by created_date desc limit 1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/issuer",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"issuer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switch_Transactions_Recharge",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var Transaction_Response_Code = res_body.responseCode\r",
+							"\r",
+							"console.log('ResponseCode => ' + Transaction_Response_Code)\r",
+							"\r",
+							"if (Transaction_Response_Code != 100) {   \r",
+							"  pm.execution.setNextRequest(null)\r",
+							"}\r",
+							"\r",
+							"let trans_id = res_body.transactionId\r",
+							"\r",
+							"pm.environment.set('trans_id_AfterRecharge', trans_id)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amount\": {{recharge_amount}},\r\n    \"bankId\": \"{{consumer_bank_id}}\",\r\n    \"transactionType\": \"recharge\",\r\n    \"email\": \"{{consumer_email}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuer_api_url}}/issuer/recharge",
+					"host": [
+						"{{issuer_api_url}}"
+					],
+					"path": [
+						"issuer",
+						"recharge"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switch_Transactions_Recharge_Confirm",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"cardNumber\": \"{{consumer_card_number}}\",\r\n    \"process\": \"Recharge Confirm\",\r\n    \"transactionId\": \"{{trans_id_AfterRecharge}}\" // give transaction id of relevent process\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuer_api_url}}/issuer/cardAccointing",
+					"host": [
+						"{{issuer_api_url}}"
+					],
+					"path": [
+						"issuer",
+						"cardAccointing"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DB_Issuer_Account_Activity_AfterRecharge",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"data.forEach(object => {\r",
+							"    pm.test(`card_number => ${object.card_number}`, () => {\r",
+							"        pm.expect(object.card_number).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`transaction_id => ${object.transaction_id}`, () => {\r",
+							"        pm.expect(object.transaction_id).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`amount_activity_date => ${object.amount_activity_date}`, () => {\r",
+							"        pm.expect(object.amount_activity_date).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`created_date => ${object.created_date}`, () => {\r",
+							"        pm.expect(object.created_date).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`trigger_activity => ${object.trigger_activity}`, () => {\r",
+							"        pm.expect(object.trigger_activity).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`amount => ${object.amount}`, () => {\r",
+							"        pm.expect(object.amount).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`available_balance => ${object.available_balance}`, () => {\r",
+							"        pm.expect(object.available_balance).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`pending_balance => ${object.pending_balance}`, () => {\r",
+							"        pm.expect(object.pending_balance).to.be.not.null;\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from customer.account_activity aa where card_number in ('{{consumer_card_number}}') and transaction_id in ('{{trans_id_AfterRecharge}}')\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/issuer",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"issuer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switch_Transactions_Redemption",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"let trans_id_redemption = res_body.transactionId\r",
+							"\r",
+							"pm.environment.set('trans_id_AfterRedemption', trans_id_redemption)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"amount\": {{redemption_amount}},\r\n    \"bankId\": \"{{consumer_bank_id}}\",\r\n    \"transactionType\": \"redemption\",\r\n    \"email\": \"{{consumer_email}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuer_api_url}}/issuer/recharge",
+					"host": [
+						"{{issuer_api_url}}"
+					],
+					"path": [
+						"issuer",
+						"recharge"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DB_Issuer_Account_Activity_AfterRedemption",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"data.forEach(object => {\r",
+							"    pm.test(`card_number => ${object.card_number}`, () => {\r",
+							"        pm.expect(object.card_number).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`transaction_id => ${object.transaction_id}`, () => {\r",
+							"        pm.expect(object.transaction_id).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`amount_activity_date => ${object.amount_activity_date}`, () => {\r",
+							"        pm.expect(object.amount_activity_date).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`created_date => ${object.created_date}`, () => {\r",
+							"        pm.expect(object.created_date).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`trigger_activity => ${object.trigger_activity}`, () => {\r",
+							"        pm.expect(object.trigger_activity).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`amount => ${object.amount}`, () => {\r",
+							"        pm.expect(object.amount).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`available_balance => ${object.available_balance}`, () => {\r",
+							"        pm.expect(object.available_balance).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`pending_balance => ${object.pending_balance}`, () => {\r",
+							"        pm.expect(object.pending_balance).to.be.not.null;\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from customer.account_activity aa where card_number in ('{{consumer_card_number}}') and transaction_id in ('{{trans_id_AfterRedemption}}')\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/issuer",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"issuer"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "trans_uuid",
+			"value": ""
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "totp_secret",
+			"value": ""
+		},
+		{
+			"key": "otp",
+			"value": ""
+		},
+		{
+			"key": "payment_token",
+			"value": ""
+		},
+		{
+			"key": "customer_id",
+			"value": ""
+		},
+		{
+			"key": "first_name",
+			"value": ""
+		},
+		{
+			"key": "last_name",
+			"value": ""
+		},
+		{
+			"key": "phone",
+			"value": ""
+		},
+		{
+			"key": "token_before_encoding",
+			"value": ""
+		},
+		{
+			"key": "card_number",
+			"value": ""
+		},
+		{
+			"key": "consumer_bank_id",
+			"value": ""
+		},
+		{
+			"key": "consumer_email",
+			"value": ""
+		},
+		{
+			"key": "emailvalue",
+			"value": ""
+		},
+		{
+			"key": "pwdvalue",
+			"value": ""
+		},
+		{
+			"key": "pwd_decoded_value",
+			"value": ""
+		},
+		{
+			"key": "consumer_card_number",
+			"value": ""
+		},
+		{
+			"key": "trans_id",
+			"value": ""
+		},
+		{
+			"key": "trans_id_AfterRecharge",
+			"value": ""
+		},
+		{
+			"key": "trans_id_AfterRedemption",
+			"value": ""
+		},
+		{
+			"key": "pwd_value",
+			"value": ""
+		},
+		{
+			"key": "recharge_amount",
+			"value": ""
+		},
+		{
+			"key": "redemption_amount",
+			"value": ""
+		},
+		{
+			"key": "Testing_Env",
+			"value": ""
+		}
+	]
+}

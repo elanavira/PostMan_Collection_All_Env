@@ -1,0 +1,2 @@
+Testing_Env,consumer_card_number,amount,transaction_type,currency,tid,merchant_name,merchant_id,merchant_email,merchant_pwd,totp_secret,first_name,last_name,phone
+VAPT,9000019725188560,35,sale,USD,LUT,Waterfall,6f5e00a3-0104-4900-b045-7325005a4761,waterfallflat@gmail.com,Admin@123,GI2TMOJZGI======,Alexander,Kelly,908-650-2993

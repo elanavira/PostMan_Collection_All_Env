@@ -1,0 +1,896 @@
+{
+	"info": {
+		"_postman_id": "6cb49261-932a-4548-a25f-08d86062a955",
+		"name": "Switch_API_Transactions_ChargeBacks_Approve_All_Env",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33665851"
+	},
+	"item": [
+		{
+			"name": "DB_Issuer_Account_Activity_BeforeSwitchPayment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"data.forEach(object => {\r",
+							"    pm.test(`card_number => ${object.card_number}`, () => {\r",
+							"        pm.expect(object.card_number).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`transaction_id => ${object.transaction_id}`, () => {\r",
+							"        pm.expect(object.transaction_id).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`amount_activity_date => ${object.amount_activity_date}`, () => {\r",
+							"        pm.expect(object.amount_activity_date).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`created_date => ${object.created_date}`, () => {\r",
+							"        pm.expect(object.created_date).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`trigger_activity => ${object.trigger_activity}`, () => {\r",
+							"        pm.expect(object.trigger_activity).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`amount => ${object.amount}`, () => {\r",
+							"        pm.expect(object.amount).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`available_balance => ${object.available_balance}`, () => {\r",
+							"        pm.expect(object.available_balance).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`pending_balance => ${object.pending_balance}`, () => {\r",
+							"        pm.expect(object.pending_balance).to.be.not.null;\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set('Testing_Env', pm.iterationData.get(\"Testing_Env\"))\r",
+							"\r",
+							"var test_env = pm.environment.get('Testing_Env')\r",
+							"\r",
+							"if (test_env == 'Stage')\r",
+							"{\r",
+							"   pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.stage-orlando.payresults.ai\")\r",
+							"   pm.environment.set (\"issuer_api_url\",\"https://issuer-api.stage-orlando.payresults.ai\")\r",
+							"   pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.stage-orlando.payresults.ai\")  \r",
+							"   pm.environment.set(\"db\", \"https://ops-dashboard.stage-orlando.payresults.ai\")\r",
+							"}\r",
+							"else if (test_env == 'UAT')\r",
+							"{\r",
+							"    pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.uat-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"issuer_api_url\",\"https://issuer-api.uat-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.uat-orlando.payresults.ai\")  \r",
+							"    pm.environment.set(\"db\", \"https://ops-dashboard.uat-orlando.payresults.ai\")\r",
+							"}\r",
+							"else\r",
+							"{\r",
+							"    pm.environment.set (\"payment_switch_api_url\",\"https://payment-switch.vapt-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"issuer_api_url\",\"https://issuer-api.vapt-orlando.payresults.ai\")\r",
+							"    pm.environment.set (\"clearingFile_api_url\",\"https://pay-api.vapt-orlando.payresults.ai\")    \r",
+							"    pm.environment.set(\"db\", \"https://ops-dashboard.vapt-orlando.payresults.ai\")\r",
+							"}\r",
+							"\r",
+							"pm.environment.set('consumer_card_number', pm.iterationData.get(\"consumer_card_number\"))\r",
+							"pm.environment.set('amount', pm.iterationData.get(\"amount\"))\r",
+							"pm.environment.set('transaction_type', pm.iterationData.get(\"transaction_type\"))\r",
+							"pm.environment.set('currency', pm.iterationData.get(\"currency\"))\r",
+							"pm.environment.set('tid', pm.iterationData.get(\"tid\"))\r",
+							"pm.environment.set('merchant_name', pm.iterationData.get(\"merchant_name\"))\r",
+							"pm.environment.set('merchant_id', pm.iterationData.get(\"merchant_id\"))\r",
+							"pm.environment.set('merchant_email', pm.iterationData.get(\"merchant_email\"))\r",
+							"pm.environment.set('merchant_pwd', pm.iterationData.get(\"merchant_pwd\"))\r",
+							"pm.environment.set('totp_secret', pm.iterationData.get(\"totp_secret\"))\r",
+							"pm.environment.set('first_name', pm.iterationData.get(\"first_name\"))\r",
+							"pm.environment.set('last_name', pm.iterationData.get(\"last_name\"))\r",
+							"pm.environment.set('phone', pm.iterationData.get(\"phone\"))\r",
+							"pm.environment.set('customer_id', pm.iterationData.get(\"customer_id\"))"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from customer.account_activity aa where card_number in ('{{consumer_card_number}}') order by created_date desc limit 1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/issuer",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"issuer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BearerToken_Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var access_token = res_body.responseObject.access_token\r",
+							"\r",
+							"console.log(access_token)\r",
+							"\r",
+							"pm.environment.set('access_token', access_token)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{merchant_pwd}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{merchant_email}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment_switch_api_url}}/login",
+					"host": [
+						"{{payment_switch_api_url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "totp_creation",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var totp_secret = pm.environment.get('totp_secret')"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var totp_created = res_body\r",
+							"\r",
+							"console.log(totp_created)\r",
+							"\r",
+							"pm.environment.set('otp', totp_created)\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuer_api_url}}/issuer/totp?key={{totp_secret}}&seconds=60",
+					"host": [
+						"{{issuer_api_url}}"
+					],
+					"path": [
+						"issuer",
+						"totp"
+					],
+					"query": [
+						{
+							"key": "key",
+							"value": "{{totp_secret}}"
+						},
+						{
+							"key": "seconds",
+							"value": "60"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switch_Transactions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var Transaction_Response_Code = res_body.response_code\r",
+							"\r",
+							"if (Transaction_Response_Code != 100) {   \r",
+							"  pm.execution.setNextRequest('BearerToken_Logout')\r",
+							"}\r",
+							"\r",
+							"var exp_res_code = '100'\r",
+							"\r",
+							"var act_res_text = res_body.responsetext\r",
+							"console.log(act_res_text)\r",
+							"\r",
+							"var act_res_code = res_body.response_code\r",
+							"console.log('Actual Res Code',act_res_code)\r",
+							"\r",
+							"pm.test(\"Assert Response Code || \" + act_res_code + \" || \" + \" Response Text => \" + act_res_text, function()\r",
+							"    {  \r",
+							"  pm.expect(exp_res_code).to.equal(act_res_code);\r",
+							"})\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var uuid=require('uuid')\r",
+							"var trans_uuid=uuid.v4();\r",
+							"pm.environment.set('trans_uuid', trans_uuid)\r",
+							"\r",
+							"//var otp = pm.collectionVariables.get('otp').toString()\r",
+							"\r",
+							"var transaction_type = pm.environment.get('transaction_type')\r",
+							"\r",
+							"var otp = pm.environment.get('otp')\r",
+							"\r",
+							"var firstName = pm.environment.get('first_name')\r",
+							"\r",
+							"var lastName = pm.environment.get('last_name')\r",
+							"\r",
+							"var PhoneNumber = pm.environment.get('phone')\r",
+							"\r",
+							"var cardNumber = pm.environment.get('consumer_card_number')\r",
+							"\r",
+							"const btoa = require(\"btoa\");\r",
+							"//let cardNumber = 9000013018687677\r",
+							"// let firstName = 'Adam'\r",
+							"// let lastName = 'test'\r",
+							"// let PhoneNumber = '8765434567'\r",
+							"let consolidated = `(${firstName}, ${lastName}, ${PhoneNumber}):(${cardNumber},${otp}):37.4219983:-122.084:LütConsumer`\r",
+							"\r",
+							"console.log(consolidated)\r",
+							"\r",
+							"pm.environment.set('token_before_encoding', consolidated)\r",
+							"\r",
+							"var Btoa_encodedData = btoa(consolidated);\r",
+							"\r",
+							"console.log(Btoa_encodedData)\r",
+							"\r",
+							"pm.environment.set('payment_token', Btoa_encodedData)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"type\": \"{{transaction_type}}\",\r\n    \"payment_token\":\"{{payment_token}}\",\r\n    \"transaction_id\": \"{{trans_uuid}}\",\r\n    \"tid\": \"{{tid}}\",\r\n    \"amount\": {{amount}},\r\n    \"currency\": \"{{currency}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment_switch_api_url}}/transactions",
+					"host": [
+						"{{payment_switch_api_url}}"
+					],
+					"path": [
+						"transactions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DB_Switch_Capture_Transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"var ref_id = pm.environment.get('trans_uuid')\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Assert Reference Id || \" + res_body[0].transaction_id, function()\r",
+							"    {  \r",
+							"  pm.expect(res_body[0].reference_id).to.equal(ref_id);\r",
+							"})\r",
+							"\r",
+							"let trans_id = res_body[0].transaction_id\r",
+							"let capture_id = res_body[0].id\r",
+							"\r",
+							"pm.environment.set('trans_id', trans_id)\r",
+							"\r",
+							"pm.environment.set('capture_id', capture_id)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from payment.capture where reference_id IN ('{{trans_uuid}}')\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/switch",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"switch"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DB_Issuer_Account_Activity_AfterSwitchPayment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"data.forEach(object => {\r",
+							"    pm.test(`card_number => ${object.card_number}`, () => {\r",
+							"        pm.expect(object.card_number).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`transaction_id => ${object.transaction_id}`, () => {\r",
+							"        pm.expect(object.transaction_id).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`amount_activity_date => ${object.amount_activity_date}`, () => {\r",
+							"        pm.expect(object.amount_activity_date).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`created_date => ${object.created_date}`, () => {\r",
+							"        pm.expect(object.created_date).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`trigger_activity => ${object.trigger_activity}`, () => {\r",
+							"        pm.expect(object.trigger_activity).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`amount => ${object.amount}`, () => {\r",
+							"        pm.expect(object.amount).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`available_balance => ${object.available_balance}`, () => {\r",
+							"        pm.expect(object.available_balance).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`pending_balance => ${object.pending_balance}`, () => {\r",
+							"        pm.expect(object.pending_balance).to.be.not.null;\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from customer.account_activity aa where card_number in ('{{consumer_card_number}}') and transaction_id in ('{{trans_id}}')\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/issuer",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"issuer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switch_Transactions_DisputeAgainstTransaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"let dispute_trans_id = res_body.transactionId\r",
+							"\r",
+							"pm.environment.set('dispute_trans_id', dispute_trans_id)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"transactionId\":\"{{trans_id}}\",\r\n    \"customerId\":\"{{customer_id}}\",\r\n    \"customerComplaintPrimartText\":\"refund01\",\r\n    \"additionalComments\":\"improper transaction\",\r\n    \"createdMethod\":\"LutApp\",\r\n    \"disputeAmount\":{{amount}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuer_api_url}}/issuer/createDisputeAgainstTransaction",
+					"host": [
+						"{{issuer_api_url}}"
+					],
+					"path": [
+						"issuer",
+						"createDisputeAgainstTransaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Switch_Transactions_DisputeApproveTransaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () \r",
+							"{\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followOriginalHttpMethod": true,
+				"strictSSL": true,
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"transactionDisputeId\": \"{{dispute_trans_id}}\",\r\n    \"reviewStatus\": \"Approve\",\r\n    \"reviewerComments\": \"test123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{issuer_api_url}}/issuer/reviewTransactionDispute",
+					"host": [
+						"{{issuer_api_url}}"
+					],
+					"path": [
+						"issuer",
+						"reviewTransactionDispute"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DB_Issuer_Account_Activity_AfterDisputeApproved",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"data.forEach(object => {\r",
+							"    pm.test(`card_number => ${object.card_number}`, () => {\r",
+							"        pm.expect(object.card_number).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`transaction_id => ${object.transaction_id}`, () => {\r",
+							"        pm.expect(object.transaction_id).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`amount_activity_date => ${object.amount_activity_date}`, () => {\r",
+							"        pm.expect(object.amount_activity_date).to.be.not.null;\r",
+							"    });\r",
+							"     pm.test(`created_date => ${object.created_date}`, () => {\r",
+							"        pm.expect(object.created_date).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`trigger_activity => ${object.trigger_activity}`, () => {\r",
+							"        pm.expect(object.trigger_activity).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`amount => ${object.amount}`, () => {\r",
+							"        pm.expect(object.amount).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`available_balance => ${object.available_balance}`, () => {\r",
+							"        pm.expect(object.available_balance).to.be.not.null;\r",
+							"    });\r",
+							"    pm.test(`pending_balance => ${object.pending_balance}`, () => {\r",
+							"        pm.expect(object.pending_balance).to.be.not.null;\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"query\": \"select * from customer.account_activity aa where card_number in ('{{consumer_card_number}}') and transaction_id in ('{{dispute_trans_id}}')\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{db}}/raw/issuer",
+					"host": [
+						"{{db}}"
+					],
+					"path": [
+						"raw",
+						"issuer"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BearerToken_Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var res_body = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var res_code = res_body.responseCode\r",
+							"\r",
+							"console.log(res_code)\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payment_switch_api_url}}/logout",
+					"host": [
+						"{{payment_switch_api_url}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "trans_uuid",
+			"value": ""
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "totp_secret",
+			"value": ""
+		},
+		{
+			"key": "otp",
+			"value": ""
+		},
+		{
+			"key": "payment_token",
+			"value": ""
+		},
+		{
+			"key": "customer_id",
+			"value": ""
+		},
+		{
+			"key": "first_name",
+			"value": ""
+		},
+		{
+			"key": "last_name",
+			"value": ""
+		},
+		{
+			"key": "phone",
+			"value": ""
+		},
+		{
+			"key": "token_before_encoding",
+			"value": ""
+		},
+		{
+			"key": "card_number",
+			"value": ""
+		},
+		{
+			"key": "trans_id",
+			"value": ""
+		},
+		{
+			"key": "capture_id",
+			"value": ""
+		},
+		{
+			"key": "dispute_trans_id",
+			"value": ""
+		},
+		{
+			"key": "Testing_Env",
+			"value": ""
+		}
+	]
+}

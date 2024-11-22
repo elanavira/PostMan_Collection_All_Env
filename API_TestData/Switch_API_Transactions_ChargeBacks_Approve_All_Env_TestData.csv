@@ -1,0 +1,2 @@
+Testing_Env,consumer_card_number,amount,transaction_type,currency,tid,merchant_name,merchant_id,merchant_email,merchant_pwd,totp_secret,first_name,last_name,phone,customer_id
+VAPT,9000012289281293,32,sale,USD,LUT,StandardPass,2a264212-2587-4ba7-94bf-276fc33d26c7,standardpass@gmail.com,Admin@123,GI2TMOJZGY======,Kay,Sieben,803-442-8049,90bf2dd3-21b1-4915-9886-87416e6b00e2
